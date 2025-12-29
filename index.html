@@ -1,0 +1,53 @@
+// CONFIGURAÇÕES DE RECEBIMENTO
+const MINHA_CHAVE_PIX = "523.852.778-08"; // Sua chave aqui
+const MEU_WHATSAPP = "(18) 99629-6170"; // Seu número (com DDD e 55)
+
+function copiarPix() {
+    const chave = document.getElementById('chave-pix').innerText;
+    navigator.clipboard.writeText(chave);
+    alert("Chave PIX copiada!");
+}
+
+// ATUALIZE sua função finalizarCompra para abrir o pagamento:
+async function finalizarCompra() {
+    if (carrinho.length === 0) return alert("Carrinho vazio!");
+    
+    const total = carrinho.reduce((sum, item) => sum + item.preco, 0);
+    const itensNomes = carrinho.map(i => i.nome).join(', ');
+
+    // 1. Salva no Firebase (para você ter o registro no ADM)
+    try {
+        await addDoc(collection(db, "vendas"), {
+            itens: itensNomes,
+            total: total,
+            data: new Date().toLocaleString(),
+            status: "Aguardando Pagamento"
+        });
+
+        // 2. Abre o Modal de Pagamento
+        document.getElementById('modal-carrinho').style.display = 'none';
+        document.getElementById('modal-pagamento').style.display = 'flex';
+        
+    } catch (e) {
+        alert("Erro ao processar pedido.");
+    }
+}
+
+function enviarWhatsApp() {
+    const total = carrinho.reduce((sum, item) => sum + item.preco, 0);
+    const itensNomes = carrinho.map(i => i.nome).join(', ');
+    
+    const mensagem = `Olá! Acabei de fazer um pedido na Ilha Bela Store:
+📦 *Itens:* ${itensNomes}
+💰 *Total:* R$ ${total.toFixed(2)}
+✅ *Estou enviando o comprovante em anexo.*`;
+
+    const url = `https://wa.me/${MEU_WHATSAPP}?text=${encodeURIComponent(mensagem)}`;
+    
+    // Limpa o carrinho após enviar
+    carrinho = [];
+    document.getElementById('cart-count').innerText = 0;
+    document.getElementById('modal-pagamento').style.display = 'none';
+    
+    window.open(url, '_blank');
+}
