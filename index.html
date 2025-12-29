@@ -3,249 +3,214 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ilha Bela Store | Oficial</title>
+    <title>Ilha Bela Hub | Vendas & Suporte</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .modal { display: none; position: fixed; z-index: 50; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); }
-        body { background-color: #020617; color: #f8fafc; font-family: 'Inter', sans-serif; }
-        .card-item { background: rgba(30, 41, 59, 0.5); border: 1px solid #334155; transition: all 0.3s; }
-        .card-item:hover { border-color: #eab308; transform: translateY(-4px); box-shadow: 0 10px 20px -10px rgba(234, 179, 8, 0.3); }
-        .pixel-border { border: 2px solid #eab308; box-shadow: 4px 4px 0px #854d0e; }
+        .chat-window { height: 400px; overflow-y: auto; scroll-behavior: smooth; }
+        .hidden { display: none; }
+        body { background: #020617; color: white; }
+        .admin-sidebar { border-right: 1px solid #1e293b; }
     </style>
 </head>
 <body>
 
-    <nav class="bg-black border-b border-yellow-600/50 sticky top-0 z-40 backdrop-blur-md">
-        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-            <h1 class="text-2xl font-black text-yellow-500 tracking-tighter cursor-pointer" onclick="window.location.reload()">ILHA BELA STORE</h1>
-            <div class="flex items-center gap-4">
-                <button onclick="showSection('loja')" class="hover:text-yellow-500 font-bold text-sm">LOJA</button>
-                <button onclick="toggleCart()" class="bg-yellow-600 text-black px-4 py-1.5 rounded-lg text-sm font-black flex items-center gap-2">
-                    🛒 <span id="cart-count">0</span>
-                </button>
-                <button id="btn-adm" onclick="solicitarLogin()" class="text-[10px] border border-gray-700 text-gray-500 px-2 py-1 rounded uppercase hover:border-yellow-500 hover:text-yellow-500 transition">Adm</button>
-            </div>
+    <nav class="bg-black border-b border-yellow-600 p-4 flex justify-between items-center sticky top-0 z-50">
+        <h1 class="text-xl font-black text-yellow-500 tracking-tighter">ILHA BELA HUB</h1>
+        <div class="flex gap-4">
+            <button onclick="showSection('loja')" class="text-sm font-bold">LOJA</button>
+            <button id="btn-adm-login" onclick="solicitarAcessoAdm()" class="text-sm text-gray-500 bg-gray-900 px-3 py-1 rounded">PAINEL ADM</button>
         </div>
     </nav>
 
-    <section id="secao-loja" class="container mx-auto px-4 py-12">
-        <div class="text-center mb-16">
-            <h2 class="text-5xl font-black mb-4 tracking-tight">VIP & <span class="text-yellow-500">SERVICES</span></h2>
-            <p class="text-gray-400">Artes profissionais e vantagens exclusivas para a Ilha Bela.</p>
-        </div>
-
-        <div id="lista-produtos" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    <section id="secao-loja" class="container mx-auto p-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="grid-produtos">
             </div>
     </section>
 
-    <section id="secao-admin" class="container mx-auto px-4 py-12 hidden">
-        <div class="flex flex-col md:flex-row justify-between items-center mb-10 gap-4">
-            <h2 class="text-3xl font-bold text-yellow-500">Painel do Sr. Leal</h2>
-            <button onclick="window.location.reload()" class="bg-red-900/30 text-red-500 px-4 py-2 rounded-lg border border-red-500/20 text-sm">Sair do Painel</button>
+    <div id="chat-container" class="fixed bottom-4 right-4 w-80 bg-slate-900 border border-yellow-600 rounded-t-2xl shadow-2xl hidden">
+        <div class="bg-yellow-600 p-3 text-black font-bold flex justify-between rounded-t-xl">
+            <span>Suporte Online</span>
+            <button onclick="fecharChat()">X</button>
         </div>
+        <div id="chat-mensagens" class="chat-window p-4 text-sm flex flex-col gap-2"></div>
+        <div class="p-3 border-t border-slate-800 flex gap-2">
+            <input type="text" id="input-msg" placeholder="Sua mensagem..." class="flex-1 bg-black p-2 rounded text-xs outline-none">
+            <button onclick="enviarMensagem()" class="bg-yellow-600 px-3 py-1 text-black font-bold rounded">></button>
+        </div>
+    </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div class="bg-slate-900 p-8 rounded-2xl border border-slate-800">
-                <h3 class="text-xl font-bold mb-6 italic">Cadastrar Novo Item</h3>
-                <div class="space-y-4">
-                    <input type="text" id="adm-nome" placeholder="Nome do Produto" class="w-full p-3 rounded-xl bg-black border border-slate-700 outline-none focus:border-yellow-500 transition">
-                    <input type="number" id="adm-preco" placeholder="Preço (R$)" class="w-full p-3 rounded-xl bg-black border border-slate-700 outline-none focus:border-yellow-500 transition">
-                    <button onclick="adicionarProduto()" class="w-full bg-yellow-600 text-black font-black py-4 rounded-xl hover:bg-yellow-500 transition">ADICIONAR À VITRINE</button>
-                </div>
+    <section id="secao-admin" class="container mx-auto p-6 hidden">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <div class="lg:col-span-1 space-y-2 admin-sidebar pr-4">
+                <button onclick="showAdminTab('produtos')" class="w-full text-left p-3 hover:bg-slate-800 rounded">📦 Produtos</button>
+                <button onclick="showAdminTab('chats')" class="w-full text-left p-3 hover:bg-slate-800 rounded">💬 Atender Clientes</button>
+                <button onclick="showAdminTab('vendedores')" class="w-full text-left p-3 hover:bg-slate-800 rounded">👥 Vendedores</button>
+                <button onclick="showAdminTab('logs')" class="w-full text-left p-3 hover:bg-slate-800 rounded">📜 Logs do Sistema</button>
+                <button onclick="showAdminTab('config')" class="w-full text-left p-3 hover:bg-slate-800 rounded">⚙️ Configurações</button>
             </div>
 
-            <div class="bg-slate-900 p-8 rounded-2xl border border-slate-800">
-                <h3 class="text-xl font-bold mb-6 italic">Vendas Recentes (Navegador)</h3>
-                <div id="lista-vendas" class="space-y-3 max-h-80 overflow-y-auto">
-                    <p class="text-gray-500 text-center py-10">Nenhuma venda detectada neste dispositivo.</p>
+            <div class="lg:col-span-3 bg-slate-900 p-6 rounded-xl border border-slate-800">
+                
+                <div id="tab-produtos" class="admin-tab">
+                    <h2 class="text-xl font-bold mb-4">Gerenciar Produtos</h2>
+                    <div class="flex gap-2 mb-6">
+                        <input type="text" id="new-prod-name" placeholder="Nome" class="bg-black p-2 rounded flex-1">
+                        <input type="number" id="new-prod-price" placeholder="Valor" class="bg-black p-2 rounded w-24">
+                        <button onclick="addProdutoBD()" class="bg-green-600 px-4 py-2 rounded font-bold">Add</button>
+                    </div>
+                    <div id="admin-lista-produtos" class="space-y-2"></div>
+                </div>
+
+                <div id="tab-chats" class="admin-tab hidden">
+                    <h2 class="text-xl font-bold mb-4">Chats Ativos</h2>
+                    <div id="admin-lista-chats" class="grid grid-cols-1 gap-2"></div>
+                </div>
+
+                <div id="tab-logs" class="admin-tab hidden">
+                    <h2 class="text-xl font-bold mb-4">Logs Gerais</h2>
+                    <div id="lista-logs" class="text-[10px] font-mono text-gray-400 space-y-1"></div>
                 </div>
             </div>
         </div>
     </section>
 
-    <div id="modal-carrinho" class="modal flex items-center justify-center p-4">
-        <div class="bg-slate-950 border border-yellow-600/50 w-full max-w-md rounded-3xl p-8 shadow-2xl">
-            <h2 class="text-2xl font-black text-yellow-500 mb-6">Meu Pedido</h2>
-            <div id="itens-carrinho" class="space-y-4 mb-8"></div>
-            <div class="border-t border-slate-800 pt-6 flex justify-between items-center mb-8">
-                <span class="text-lg text-gray-400 font-bold">Total a pagar:</span>
-                <span class="text-3xl font-black text-white">R$ <span id="total-carrinho">0.00</span></span>
-            </div>
-            <div class="flex flex-col gap-3">
-                <button onclick="finalizarCompra()" class="w-full bg-yellow-600 text-black font-black py-4 rounded-2xl hover:bg-yellow-500 transition text-lg">PROSSEGUIR PARA O PIX</button>
-                <button onclick="toggleCart()" class="w-full py-2 text-gray-500 font-bold text-sm">Continuar Comprando</button>
-            </div>
-        </div>
-    </div>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, updateDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    <div id="modal-pagamento" class="modal flex items-center justify-center p-4">
-        <div class="bg-slate-950 border border-green-500/50 w-full max-w-md rounded-3xl p-10 text-center">
-            <div class="mb-6">
-                <div class="w-20 h-20 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-4 text-green-500 text-4xl">💰</div>
-                <h2 class="text-2xl font-black">Pagar via PIX</h2>
-                <p class="text-gray-400 text-sm">Escaneie o QR Code ou copie a chave abaixo</p>
-            </div>
-            
-            <div class="bg-white p-3 w-52 h-52 mx-auto mb-8 rounded-2xl">
-                <img id="qrcode-pix" src="" alt="QR Code PIX">
-            </div>
+        // CONFIGURAÇÃO DO FIREBASE (Coloque seus dados aqui)
+        const firebaseConfig = {
+            apiKey: "SUA_API_KEY",
+            authDomain: "SEU_PROJETO.firebaseapp.com",
+            projectId: "SEU_PROJETO_ID",
+            storageBucket: "SEU_PROJETO.appspot.com",
+            messagingSenderId: "ID",
+            appId: "APP_ID"
+        };
 
-            <div class="bg-black p-4 rounded-2xl mb-8 flex items-center justify-between border border-slate-800">
-                <code id="chave-pix" class="text-green-400 font-mono text-sm">52385277808</code>
-                <button onclick="copiarPix()" class="bg-slate-800 text-white text-xs px-3 py-1.5 rounded-lg font-bold">COPIAR</button>
-            </div>
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
 
-            <button onclick="enviarWhats()" class="w-full bg-green-600 py-4 rounded-2xl font-black flex items-center justify-center gap-3 hover:bg-green-500 transition shadow-lg shadow-green-900/20">
-                ENVIAR COMPROVANTE (WhatsApp)
-            </button>
-        </div>
-    </div>
+        // CONFIGURAÇÕES GLOBAIS
+        const EMAIL_MASTER = "srleal018@gmail.com";
+        let MEU_PIX = "52385277808";
+        let chatIdAtual = localStorage.getItem('chat_session') || "user_" + Date.now();
+        localStorage.setItem('chat_session', chatIdAtual);
 
-    <script>
-        // CONFIGURAÇÕES DO SR. LEAL
-        const EMAIL_ADM_ALVO = "srleal018@gmail.com";
-        const MEU_WHATSAPP = "5518996296170"; // Seu número configurado
-        const CHAVE_PIX_CPF = "52385277808"; // Sua chave PIX
-
-        // PRODUTOS INICIAIS
-        let produtosPadrao = [
-            { id: 1, nome: "Banner Personalizado", preco: 50.00 },
-            { id: 2, nome: "Logo Exclusiva", preco: 80.00 },
-            { id: 3, nome: "Servidor Discord (Full)", preco: 150.00 },
-            { id: 4, nome: "Site Vendas (Script)", preco: 350.00 },
-            { id: 5, nome: "Dinheiro Ilha Bela (100k)", preco: 20.00 },
-            { id: 6, nome: "Armas Ilha Bela (Kit)", preco: 180.00 },
-            { id: 7, nome: "Munição Ilha Bela (Pack)", preco: 30.00 }
-        ];
-
-        let produtos = JSON.parse(localStorage.getItem('ilhabella_prods')) || produtosPadrao;
-        let vendas = JSON.parse(localStorage.getItem('ilhabella_sales')) || [];
-        let carrinho = [];
-
-        function salvar() {
-            localStorage.setItem('ilhabella_prods', JSON.stringify(produtos));
-            localStorage.setItem('ilhabella_sales', JSON.stringify(vendas));
+        // --- SISTEMA DE LOGS ---
+        async function registrarLog(acao, usuario) {
+            await addDoc(collection(db, "logs"), {
+                timestamp: new Date().toLocaleString(),
+                acao: acao,
+                usuario: usuario
+            });
         }
 
-        // LOJA
-        function renderProdutos() {
-            const container = document.getElementById('lista-produtos');
-            container.innerHTML = produtos.map(p => `
-                <div class="card-item p-6 rounded-2xl">
-                    <div class="h-40 bg-slate-800/50 rounded-xl mb-6 flex items-center justify-center border border-slate-700">
-                        <span class="text-slate-600 font-black italic">ILHA BELA ART</span>
-                    </div>
-                    <h3 class="text-xl font-bold mb-2">${p.nome}</h3>
-                    <div class="flex justify-between items-center">
-                        <span class="text-yellow-500 font-black text-2xl font-mono">R$ ${p.preco.toFixed(2)}</span>
-                        <button onclick="addToCart(${p.id})" class="bg-white text-black px-4 py-2 rounded-xl font-black text-xs hover:bg-yellow-500 transition">ADICIONAR</button>
-                    </div>
-                </div>
-            `).join('');
+        // --- GERENCIAMENTO DE PRODUTOS ---
+        window.addProdutoBD = async () => {
+            const nome = document.getElementById('new-prod-name').value;
+            const valor = document.getElementById('new-prod-price').value;
+            await addDoc(collection(db, "produtos"), { nome, valor, ativo: true });
+            registrarLog(`Adicionou produto: ${nome}`, EMAIL_MASTER);
+        };
+
+        function carregarProdutos() {
+            onSnapshot(collection(db, "produtos"), (snap) => {
+                const grid = document.getElementById('grid-produtos');
+                const adminGrid = document.getElementById('admin-lista-produtos');
+                grid.innerHTML = ""; adminGrid.innerHTML = "";
+
+                snap.forEach(doc => {
+                    const p = doc.data();
+                    // Card Loja
+                    grid.innerHTML += `
+                        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
+                            <h3 class="text-xl font-bold">${p.nome}</h3>
+                            <p class="text-yellow-500 font-black text-2xl mb-4 text-mono">R$ ${p.valor}</p>
+                            <button onclick="abrirChat('${p.nome}')" class="w-full bg-yellow-600 text-black py-2 rounded-lg font-bold">NEGOCIAR AGORA</button>
+                        </div>`;
+                });
+            });
         }
 
-        function addToCart(id) {
-            const p = produtos.find(item => item.id == id);
-            carrinho.push(p);
-            document.getElementById('cart-count').innerText = carrinho.length;
-            // Efeito visual simples
-            const btn = event.target;
-            btn.innerText = "OK!";
-            setTimeout(() => btn.innerText = "ADICIONAR", 800);
+        // --- SISTEMA DE CHAT EM TEMPO REAL ---
+        window.abrirChat = (produto) => {
+            document.getElementById('chat-container').classList.remove('hidden');
+            enviarMensagemSistema(`Olá! Gostaria de comprar: ${produto}. Como faço para pagar via PIX?`);
+        };
+
+        async function enviarMensagemSistema(texto) {
+            await addDoc(collection(db, "chats", chatIdAtual, "mensagens"), {
+                texto: texto,
+                sender: "cliente",
+                time: new Date()
+            });
+            registrarLog("Cliente iniciou negociação", chatIdAtual);
         }
 
-        function toggleCart() {
-            const m = document.getElementById('modal-carrinho');
-            m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
-            if(m.style.display === 'flex') {
-                const container = document.getElementById('itens-carrinho');
-                let total = 0;
-                container.innerHTML = carrinho.map(i => {
-                    total += i.preco;
-                    return `<div class="flex justify-between items-center bg-slate-900/50 p-4 rounded-2xl border border-slate-800">
-                        <span class="font-bold text-sm">${i.nome}</span>
-                        <span class="text-yellow-500 font-bold text-sm">R$ ${i.preco.toFixed(2)}</span>
-                    </div>`;
-                }).join('') || '<p class="text-center text-gray-500 py-4 font-bold">Seu carrinho está vazio!</p>';
-                document.getElementById('total-carrinho').innerText = total.toFixed(2);
-            }
+        window.enviarMensagem = async () => {
+            const msg = document.getElementById('input-msg').value;
+            if(!msg) return;
+            await addDoc(collection(db, "chats", chatIdAtual, "mensagens"), {
+                texto: msg,
+                sender: "cliente",
+                time: new Date()
+            });
+            document.getElementById('input-msg').value = "";
+        };
+
+        function ouvirMensagens() {
+            const q = query(collection(db, "chats", chatIdAtual, "mensagens"), orderBy("time", "asc"));
+            onSnapshot(q, (snap) => {
+                const box = document.getElementById('chat-mensagens');
+                box.innerHTML = "";
+                snap.forEach(doc => {
+                    const m = doc.data();
+                    const align = m.sender === "cliente" ? "text-right" : "text-left";
+                    const color = m.sender === "cliente" ? "bg-yellow-600 text-black" : "bg-slate-800";
+                    box.innerHTML += `<div class="${align}"><span class="${color} p-2 rounded-lg inline-block">${m.texto}</span></div>`;
+                });
+                box.scrollTop = box.scrollHeight;
+            });
         }
 
-        function finalizarCompra() {
-            if(carrinho.length === 0) return;
-            const total = carrinho.reduce((a, b) => a + b.preco, 0);
-            
-            // Gerar QR Code via API pública (baseado no valor e chave)
-            const qrData = `PIX|CHAVE:${CHAVE_PIX_CPF}|VALOR:${total.toFixed(2)}|LOJA:ILHABELASTORE`;
-            document.getElementById('qrcode-pix').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrData)}`;
-            
-            // Salvar no historico local
-            vendas.push({ data: new Date().toLocaleString(), total, itens: carrinho.map(c => c.nome).join(', ') });
-            salvar();
-
-            document.getElementById('modal-carrinho').style.display = 'none';
-            document.getElementById('modal-pagamento').style.display = 'flex';
-        }
-
-        function copiarPix() {
-            navigator.clipboard.writeText(CHAVE_PIX_CPF);
-            alert("Chave PIX copiada!");
-        }
-
-        function enviarWhats() {
-            const total = carrinho.reduce((a, b) => a + b.preco, 0);
-            const itens = carrinho.map(c => c.nome).join(', ');
-            const msg = encodeURIComponent(`*NOVO PEDIDO - ILHA BELA STORE*\n\n📦 *ITENS:* ${itens}\n💰 *TOTAL:* R$ ${total.toFixed(2)}\n\n_Acabei de fazer o PIX, segue o comprovante:_`);
-            window.open(`https://wa.me/${MEU_WHATSAPP}?text=${msg}`, '_blank');
-            carrinho = [];
-            window.location.reload();
-        }
-
-        // ADMIN
-        function solicitarLogin() {
-            const email = prompt("Digite seu e-mail de administrador:");
-            if(email === EMAIL_ADM_ALVO) {
+        // --- ÁREA ADMINISTRATIVA ---
+        window.solicitarAcessoAdm = () => {
+            const email = prompt("Email de Acesso:");
+            if(email === EMAIL_MASTER) {
                 document.getElementById('secao-loja').classList.add('hidden');
                 document.getElementById('secao-admin').classList.remove('hidden');
-                renderVendas();
+                registrarLog("Login realizado no painel", email);
+                carregarLogs();
             } else {
-                alert("Acesso exclusivo para srleal018@gmail.com");
+                alert("Acesso Negado.");
             }
+        };
+
+        window.showAdminTab = (tab) => {
+            document.querySelectorAll('.admin-tab').forEach(el => el.classList.add('hidden'));
+            document.getElementById('tab-' + tab).classList.remove('hidden');
+        };
+
+        function carregarLogs() {
+            onSnapshot(query(collection(db, "logs"), orderBy("timestamp", "desc")), (snap) => {
+                const lista = document.getElementById('lista-logs');
+                lista.innerHTML = "";
+                snap.forEach(doc => {
+                    const l = doc.data();
+                    lista.innerHTML += `<div>[${l.timestamp}] - ${l.usuario}: ${l.acao}</div>`;
+                });
+            });
         }
 
-        function adicionarProduto() {
-            const nome = document.getElementById('adm-nome').value;
-            const preco = parseFloat(document.getElementById('adm-preco').value);
-            if(nome && preco) {
-                produtos.push({ id: Date.now(), nome, preco });
-                salvar();
-                renderProdutos();
-                alert("Produto adicionado à vitrine!");
-                document.getElementById('adm-nome').value = '';
-                document.getElementById('adm-preco').value = '';
-            }
-        }
-
-        function renderVendas() {
-            const container = document.getElementById('lista-vendas');
-            container.innerHTML = vendas.map(v => `
-                <div class="bg-black p-4 rounded-xl border-l-4 border-yellow-600">
-                    <div class="flex justify-between font-black text-sm text-yellow-500 mb-1">
-                        <span>R$ ${v.total.toFixed(2)}</span>
-                        <span class="text-gray-600 text-[10px]">${v.data}</span>
-                    </div>
-                    <p class="text-[11px] text-gray-400 font-medium">Produtos: ${v.itens}</p>
-                </div>
-            `).reverse().join('') || '<p class="text-gray-500 text-center py-10">Sem vendas.</p>';
-        }
-
-        function showSection(sec) {
+        // INICIALIZAÇÃO
+        carregarProdutos();
+        ouvirMensagens();
+        window.fecharChat = () => document.getElementById('chat-container').classList.add('hidden');
+        window.showSection = (sec) => {
             document.getElementById('secao-loja').classList.remove('hidden');
             document.getElementById('secao-admin').classList.add('hidden');
         }
-
-        // START
-        renderProdutos();
     </script>
 </body>
 </html>
