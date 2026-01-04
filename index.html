@@ -11,6 +11,7 @@
             --sed-secondary: #0077b6;
             --sed-dark: #1d2d35;
             --sed-bg: #f0f4f7;
+            --sed-error: #dc3545;
         }
         
         body { font-family: 'Segoe UI', Arial, sans-serif; background-color: var(--sed-bg); margin: 0; padding: 20px; }
@@ -36,47 +37,62 @@
         .btn-save { background-color: var(--sed-primary); }
         .btn-log { background: #6c757d; margin-top: 20px; }
         .hidden { display: none; }
+        
+        /* Estilos da Tabela */
         .table-container { overflow-x: auto; margin-top: 20px; }
         table { width: 100%; border-collapse: collapse; }
         th { background: #f8f9fa; padding: 12px; text-align: left; border-bottom: 2px solid #dee2e6; }
         td { padding: 12px; border-bottom: 1px solid #eee; font-size: 14px; }
         .badge-download { background-color: var(--sed-primary); color: white; padding: 6px 12px; border-radius: 4px; cursor: pointer; border: none; }
 
-        /* Estilos do Novo Modal de Alerta */
-        #custom-alert {
-            display: none; 
-            position: fixed; 
-            top: 0; left: 0; 
-            width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.6); 
-            z-index: 9999; 
-            justify-content: center; 
-            align-items: center;
-            backdrop-filter: blur(2px);
+        /* MODAIS CUSTOMIZADOS */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.7); z-index: 9999; justify-content: center; align-items: center;
+            backdrop-filter: blur(4px);
         }
-        .alert-content {
-            background: white; 
-            padding: 30px; 
-            border-radius: 12px; 
-            max-width: 380px; 
-            width: 85%; 
-            text-align: center; 
-            box-shadow: 0 15px 35px rgba(0,0,0,0.3); 
-            border-top: 8px solid var(--sed-primary);
-            animation: fadeIn 0.3s ease-out;
+        .modal-content {
+            background: white; padding: 30px; border-radius: 12px; max-width: 400px; width: 90%; 
+            text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.4); 
+            animation: modalIn 0.3s ease-out;
         }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.9) translateY(-20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
         }
+        .modal-btn-confirm { background: var(--sed-primary); width: auto; padding: 10px 25px; margin: 5px; }
+        .modal-btn-cancel { background: #6c757d; width: auto; padding: 10px 25px; margin: 5px; }
     </style>
 </head>
 <body>
 
-    <div id="custom-alert">
-        <div class="alert-content">
-            <p id="alert-message" style="font-size: 18px; color: var(--sed-dark); margin-bottom: 25px; line-height: 1.4;"></p>
-            <button onclick="closeAlert()" style="background: var(--sed-primary); width: auto; min-width: 120px; padding: 10px 20px;">Entendido</button>
+    <div id="modal-alert" class="modal-overlay">
+        <div class="modal-content" style="border-top: 8px solid var(--sed-primary);">
+            <p id="alert-text" style="font-size: 18px; margin-bottom: 25px; color: var(--sed-dark);"></p>
+            <button onclick="closeAlert()" class="modal-btn-confirm">Entendido</button>
+        </div>
+    </div>
+
+    <div id="modal-prompt" class="modal-overlay">
+        <div class="modal-content" style="border-top: 8px solid var(--sed-secondary);">
+            <h3 style="margin-top: 0;">Acesso Restrito</h3>
+            <p>Digite a senha para acessar o histórico:</p>
+            <input type="password" id="prompt-input" style="margin-bottom: 20px; text-align: center;" placeholder="****">
+            <div style="display: flex; justify-content: center;">
+                <button onclick="closePrompt()" class="modal-btn-cancel">Cancelar</button>
+                <button onclick="confirmPrompt()" class="modal-btn-confirm" style="background: var(--sed-secondary);">Acessar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-confirm" class="modal-overlay">
+        <div class="modal-content" style="border-top: 8px solid var(--sed-error);">
+            <h3 style="color: var(--sed-error);">Confirmar Exclusão</h3>
+            <p>Tem certeza que deseja apagar todos os registros permanentemente?</p>
+            <div style="display: flex; justify-content: center;">
+                <button onclick="closeConfirm(false)" class="modal-btn-cancel">Não</button>
+                <button onclick="closeConfirm(true)" class="modal-btn-confirm" style="background: var(--sed-error);">Sim, Apagar</button>
+            </div>
         </div>
     </div>
 
@@ -109,16 +125,12 @@
             <a href="#" onclick="location.reload()" style="color: #dc3545; font-size: 12px;">Sair</a>
         </div>
         <h2>Cadastrar Ação - Grêmio Estudantil</h2>
-        
         <div class="form-group"><label>Nome de quem está realizando a ação</label><input type="text" id="nome_executor" placeholder="Digite seu nome completo"></div>
-
         <div class="form-group"><label>Título da Ação</label><input type="text" id="titulo"></div>
-        
         <div style="display: flex; gap: 10px;">
             <div class="form-group" style="flex: 1;"><label>Data</label><input type="date" id="data"></div>
             <div class="form-group" style="flex: 1;"><label>Participantes</label><input type="number" id="qtd"></div>
         </div>
-
         <div class="form-group">
             <label>Proposta de Ação</label>
             <select id="proposta">
@@ -127,19 +139,17 @@
                 <option value="GRESP - SEDUC">GRESP - SEDUC</option>
             </select>
         </div>
-
         <div class="form-group"><label>Tema</label><input type="text" id="tema"></div>
         <div class="form-group"><label>Descrição Completa</label><textarea id="descricao" rows="4"></textarea></div>
-
         <button class="btn-save" onclick="salvarAcao()">Salvar Registro de Ação</button>
-        <button class="btn-log" onclick="acessarLogs()">Consultar Histórico de Logs</button>
+        <button class="btn-log" onclick="abrirModalSenha()">Consultar Histórico de Logs</button>
     </div>
 
     <div id="logs-screen" class="container hidden" style="max-width: 900px;">
         <h2>Histórico de Registros</h2>
         <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
-            <button onclick="voltarDash()" style="background: #343a40; width: auto; padding: 10px 20px; color: white; border: none; border-radius: 4px; cursor: pointer;">Voltar</button>
-            <button style="background: #dc3545; color: white; border: none; border-radius: 4px; padding: 10px 20px; cursor: pointer;" onclick="limparBanco()">Limpar Histórico</button>
+            <button onclick="voltarDash()" style="background: #343a40; width: auto; padding: 10px 20px;">Voltar</button>
+            <button style="background: var(--sed-error); width: auto; padding: 10px 20px;" onclick="abrirConfirmacaoLimpeza()">Limpar Histórico</button>
         </div>
         <div class="table-container">
             <table>
@@ -158,83 +168,91 @@
 
     <script>
         const { jsPDF } = window.jspdf;
-        
         const users = {
-            "COORDENADOR FINANCEIRO": "16",
-            "COORDENADOR EVENTOS": "16",
-            "COORDENADOR COMUNICAÇÃO": "16",
-            "COORDENADOR DESPORTIVO": "16",
-            "COORDENADOR CULTURAL": "16",
-            "COORDENADOR RELAÇÕES SOCIAIS/CONVIVA": "16",
-            "COMISSÃO DE DIREITOS HUMANOS": "16",
-            "CHEFE DE COMISSÕES": "16"
+            "COORDENADOR FINANCEIRO": "16", "COORDENADOR EVENTOS": "16",
+            "COORDENADOR COMUNICAÇÃO": "16", "COORDENADOR DESPORTIVO": "16",
+            "COORDENADOR CULTURAL": "16", "COORDENADOR RELAÇÕES SOCIAIS/CONVIVA": "16",
+            "COMISSÃO DE DIREITOS HUMANOS": "16", "CHEFE DE COMISSÕES": "16"
         };
-        
         let loggedUser = "";
         const DB_NAME = 'gremio_db_v6';
 
-        // --- FUNÇÕES DO ALERTA CUSTOMIZADO ---
+        // --- SISTEMA DE MODAIS ---
         function showAlert(msg) {
-            document.getElementById('alert-message').innerText = msg;
-            document.getElementById('custom-alert').style.display = 'flex';
+            document.getElementById('alert-text').innerText = msg;
+            document.getElementById('modal-alert').style.display = 'flex';
+        }
+        function closeAlert() { document.getElementById('modal-alert').style.display = 'none'; }
+
+        function abrirModalSenha() { 
+            document.getElementById('prompt-input').value = "";
+            document.getElementById('modal-prompt').style.display = 'flex'; 
+        }
+        function closePrompt() { document.getElementById('modal-prompt').style.display = 'none'; }
+        
+        function confirmPrompt() {
+            const pass = document.getElementById('prompt-input').value;
+            if (pass === "2016") {
+                closePrompt();
+                document.getElementById('dashboard').classList.add('hidden');
+                document.getElementById('logs-screen').classList.remove('hidden');
+                renderLogs();
+            } else {
+                closePrompt();
+                showAlert("Senha de acesso ao histórico inválida!");
+            }
         }
 
-        function closeAlert() {
-            document.getElementById('custom-alert').style.display = 'none';
+        function abrirConfirmacaoLimpeza() { document.getElementById('modal-confirm').style.display = 'flex'; }
+        function closeConfirm(confirmado) {
+            document.getElementById('modal-confirm').style.display = 'none';
+            if (confirmado) {
+                localStorage.removeItem(DB_NAME);
+                renderLogs();
+                showAlert("Histórico apagado com sucesso.");
+            }
         }
 
-        // --- LÓGICA DO SISTEMA ---
+        // --- LÓGICA PRINCIPAL ---
         function handleLogin() {
             const u = document.getElementById('user').value;
             const p = document.getElementById('pass').value;
-            if (u === "") return showAlert("Por favor, selecione um cargo antes de continuar.");
+            if (!u) return showAlert("Selecione seu cargo.");
             if (users[u] === p) {
                 loggedUser = u;
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('dashboard').classList.remove('hidden');
-                document.getElementById('user-display').innerText = "Cargo: " + u;
-            } else { 
-                showAlert("Senha incorreta! Tente novamente."); 
-            }
+                document.getElementById('user-display').innerText = "Logado como: " + u;
+            } else { showAlert("Senha de login incorreta!"); }
         }
 
         function salvarAcao() {
-            const executor = document.getElementById('nome_executor').value;
-            const titulo = document.getElementById('titulo').value;
-            const dataAcao = document.getElementById('data').value;
-            const qtd = document.getElementById('qtd').value;
-            const proposta = document.getElementById('proposta').value;
-            const tema = document.getElementById('tema').value;
-            const descricao = document.getElementById('descricao').value;
+            const f = {
+                ex: document.getElementById('nome_executor').value,
+                tit: document.getElementById('titulo').value,
+                dt: document.getElementById('data').value,
+                desc: document.getElementById('descricao').value
+            };
 
-            if (!executor || !titulo || !dataAcao) return showAlert("Atenção: Nome, Título e Data são obrigatórios!");
+            if (!f.ex || !f.tit || !f.dt) return showAlert("Preencha Nome, Título e Data!");
 
             const registro = {
-                id: Date.now(),
-                cargo: loggedUser,
-                autor: executor,
+                id: Date.now(), cargo: loggedUser, autor: f.ex,
                 dataReg: new Date().toLocaleDateString('pt-BR'),
                 horaReg: new Date().toLocaleTimeString('pt-BR'),
-                titulo, dataAcao, qtd, proposta, tema, descricao
+                titulo: f.tit, dataAcao: f.dt, 
+                qtd: document.getElementById('qtd').value,
+                proposta: document.getElementById('proposta').value,
+                tema: document.getElementById('tema').value,
+                descricao: f.desc
             };
 
             let logs = JSON.parse(localStorage.getItem(DB_NAME) || "[]");
             logs.push(registro);
             localStorage.setItem(DB_NAME, JSON.stringify(logs));
 
-            showAlert("Excelente! A ação foi registrada com sucesso.");
-            document.querySelectorAll('input, textarea').forEach(i => i.value = "");
-        }
-
-        function acessarLogs() {
-            const pass = prompt("Senha de acesso ao Histórico:");
-            if (pass === "2016") {
-                document.getElementById('dashboard').classList.add('hidden');
-                document.getElementById('logs-screen').classList.remove('hidden');
-                renderLogs();
-            } else if(pass !== null) { 
-                showAlert("Acesso Negado: Senha do histórico incorreta."); 
-            }
+            showAlert("Ação registrada com sucesso!");
+            document.querySelectorAll('#dashboard input, #dashboard textarea').forEach(i => i.value = "");
         }
 
         function renderLogs() {
@@ -256,44 +274,19 @@
         function gerarPDF(id) {
             const logs = JSON.parse(localStorage.getItem(DB_NAME) || "[]");
             const d = logs.find(l => l.id === id);
-            if (!d) return;
-
             const doc = new jsPDF();
-            doc.setFillColor(0, 168, 150);
-            doc.rect(0, 0, 210, 40, 'F');
-            doc.setTextColor(255, 255, 255);
-            doc.setFontSize(18);
+            doc.setFillColor(0, 168, 150); doc.rect(0, 0, 210, 40, 'F');
+            doc.setTextColor(255, 255, 255); doc.setFontSize(18);
             doc.text("RELATÓRIO DE AÇÃO ESTUDANTIL", 105, 25, { align: "center" });
-            
-            doc.setTextColor(0, 0, 0);
-            doc.setFontSize(12);
-            doc.setFont("helvetica", "bold");
-            doc.text(`Grêmio Estudantil: Geração Consciente`, 20, 55);
+            doc.setTextColor(0, 0, 0); doc.setFontSize(12); doc.setFont("helvetica", "bold");
             doc.text(`Responsável: ${d.autor} (${d.cargo})`, 20, 65);
-            
             doc.setFont("helvetica", "normal");
-            doc.text(`Título da Ação: ${d.titulo}`, 20, 80);
-            doc.text(`Data da Realização: ${d.dataAcao}`, 20, 90);
-            doc.text(`Participantes: ${d.qtd}`, 20, 100);
-            doc.text(`Origem: ${d.proposta}`, 20, 110);
-            doc.text(`Tema: ${d.tema}`, 20, 120);
-            
-            doc.line(20, 125, 190, 125);
-            doc.text("Descrição:", 20, 135);
-            const descLines = doc.splitTextToSize(d.descricao, 170);
-            doc.text(descLines, 20, 145);
-
-            doc.setFontSize(10);
-            doc.text(`Registrado em: ${d.dataReg} às ${d.horaReg}`, 20, 280);
+            doc.text(`Título: ${d.titulo} | Data: ${d.dataAcao}`, 20, 80);
+            doc.text(`Tema: ${d.tema} | Origem: ${d.proposta}`, 20, 95);
+            doc.line(20, 100, 190, 100);
+            doc.text("Descrição:", 20, 110);
+            doc.text(doc.splitTextToSize(d.descricao, 170), 20, 120);
             doc.save(`Acao_${d.titulo}.pdf`);
-        }
-
-        function limparBanco() {
-            if (confirm("Apagar todos os registros permanentemente?")) {
-                localStorage.removeItem(DB_NAME);
-                renderLogs();
-                showAlert("O histórico foi limpo.");
-            }
         }
 
         function voltarDash() {
