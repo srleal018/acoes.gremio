@@ -8,7 +8,7 @@
     <style>
         :root {
             --sed-primary: #00a896;
-            --sed-secondary: #0077b6;
+            --sed-secondary: #489cd4; /* Nova Cor Azul Solicitada */
             --sed-dark: #1d2d35;
             --sed-bg: #f0f4f7;
             --sed-error: #dc3545;
@@ -32,8 +32,10 @@
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-weight: bold; color: #444; }
         input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ced4da; border-radius: 4px; box-sizing: border-box; font-size: 15px; }
+        
         button { width: 100%; padding: 14px; background-color: var(--sed-secondary); color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 16px; transition: 0.2s; }
-        button:hover { background-color: #005f91; }
+        button:hover { filter: brightness(0.9); }
+        
         .btn-save { background-color: var(--sed-primary); }
         .btn-log { background: #6c757d; margin-top: 20px; }
         .hidden { display: none; }
@@ -43,7 +45,7 @@
         table { width: 100%; border-collapse: collapse; }
         th { background: #f8f9fa; padding: 12px; text-align: left; border-bottom: 2px solid #dee2e6; }
         td { padding: 12px; border-bottom: 1px solid #eee; font-size: 14px; }
-        .badge-download { background-color: var(--sed-primary); color: white; padding: 6px 12px; border-radius: 4px; cursor: pointer; border: none; }
+        .badge-download { background-color: var(--sed-primary); color: white; padding: 6px 12px; border-radius: 4px; cursor: pointer; border: none; width: auto; font-size: 12px; }
 
         /* MODAIS CUSTOMIZADOS */
         .modal-overlay {
@@ -62,6 +64,7 @@
         }
         .modal-btn-confirm { background: var(--sed-primary); width: auto; padding: 10px 25px; margin: 5px; }
         .modal-btn-cancel { background: #6c757d; width: auto; padding: 10px 25px; margin: 5px; }
+        .modal-btn-blue { background: var(--sed-secondary); width: auto; padding: 10px 25px; margin: 5px; }
     </style>
 </head>
 <body>
@@ -69,26 +72,26 @@
     <div id="modal-alert" class="modal-overlay">
         <div class="modal-content" style="border-top: 8px solid var(--sed-primary);">
             <p id="alert-text" style="font-size: 18px; margin-bottom: 25px; color: var(--sed-dark);"></p>
-            <button onclick="closeAlert()" class="modal-btn-confirm">Entendido</button>
+            <button onclick="closeAlert()" class="modal-btn-confirm">OK</button>
         </div>
     </div>
 
     <div id="modal-prompt" class="modal-overlay">
         <div class="modal-content" style="border-top: 8px solid var(--sed-secondary);">
-            <h3 style="margin-top: 0;">Acesso Restrito</h3>
-            <p>Digite a senha para acessar o histórico:</p>
-            <input type="password" id="prompt-input" style="margin-bottom: 20px; text-align: center;" placeholder="****">
+            <h3 style="margin-top: 0; color: var(--sed-secondary);">Acesso ao Histórico</h3>
+            <p>Digite a senha de acesso:</p>
+            <input type="password" id="prompt-input" style="margin-bottom: 20px; text-align: center;" placeholder="Senha">
             <div style="display: flex; justify-content: center;">
                 <button onclick="closePrompt()" class="modal-btn-cancel">Cancelar</button>
-                <button onclick="confirmPrompt()" class="modal-btn-confirm" style="background: var(--sed-secondary);">Acessar</button>
+                <button onclick="confirmPrompt()" class="modal-btn-blue">Acessar</button>
             </div>
         </div>
     </div>
 
     <div id="modal-confirm" class="modal-overlay">
         <div class="modal-content" style="border-top: 8px solid var(--sed-error);">
-            <h3 style="color: var(--sed-error);">Confirmar Exclusão</h3>
-            <p>Tem certeza que deseja apagar todos os registros permanentemente?</p>
+            <h3 style="color: var(--sed-error);">Atenção!</h3>
+            <p>Deseja realmente apagar todos os registros do histórico?</p>
             <div style="display: flex; justify-content: center;">
                 <button onclick="closeConfirm(false)" class="modal-btn-cancel">Não</button>
                 <button onclick="closeConfirm(true)" class="modal-btn-confirm" style="background: var(--sed-error);">Sim, Apagar</button>
@@ -100,7 +103,7 @@
         <div class="header-logos">
             <img src="https://media-gru2-1.cdn.whatsapp.net/v/t61.24694-24/489405406_650586094569182_6793834854762065392_n.jpg?ccb=11-4&oh=01_Q5Aa3QFLI5uLR7B-Jj5LSyAQd7wxXJoZ9ceCDkzThVR0E9T4Bw&oe=69645917&_nc_sid=5e03e0&_nc_cat=102" alt="Logo Grêmio GC">
         </div>
-        <h2>Acesso ao Portal Grêmio Estudantil</h2>
+        <h2>Portal Grêmio Estudantil</h2>
         <div class="form-group">
             <label>Selecione seu Cargo</label>
             <select id="user">
@@ -115,17 +118,17 @@
                 <option value="CHEFE DE COMISSÕES">CHEFE DE COMISSÕES</option>
             </select>
         </div>
-        <div class="form-group"><label>Senha</label><input type="password" id="pass" placeholder="Digite sua senha"></div>
+        <div class="form-group"><label>Senha</label><input type="password" id="pass" placeholder="Senha do cargo"></div>
         <button onclick="handleLogin()">Entrar no Sistema</button>
     </div>
 
     <div id="dashboard" class="container hidden">
         <div style="text-align: right; margin-bottom: 10px;">
             <span id="user-display" style="font-size: 12px; font-weight: bold;"></span> |
-            <a href="#" onclick="location.reload()" style="color: #dc3545; font-size: 12px;">Sair</a>
+            <a href="#" onclick="location.reload()" style="color: var(--sed-error); font-size: 12px; text-decoration: none;">Sair</a>
         </div>
-        <h2>Cadastrar Ação - Grêmio Estudantil</h2>
-        <div class="form-group"><label>Nome de quem está realizando a ação</label><input type="text" id="nome_executor" placeholder="Digite seu nome completo"></div>
+        <h2>Registrar Nova Ação</h2>
+        <div class="form-group"><label>Nome do Responsável</label><input type="text" id="nome_executor" placeholder="Seu nome"></div>
         <div class="form-group"><label>Título da Ação</label><input type="text" id="titulo"></div>
         <div style="display: flex; gap: 10px;">
             <div class="form-group" style="flex: 1;"><label>Data</label><input type="date" id="data"></div>
@@ -140,25 +143,25 @@
             </select>
         </div>
         <div class="form-group"><label>Tema</label><input type="text" id="tema"></div>
-        <div class="form-group"><label>Descrição Completa</label><textarea id="descricao" rows="4"></textarea></div>
-        <button class="btn-save" onclick="salvarAcao()">Salvar Registro de Ação</button>
-        <button class="btn-log" onclick="abrirModalSenha()">Consultar Histórico de Logs</button>
+        <div class="form-group"><label>Descrição Detalhada</label><textarea id="descricao" rows="4"></textarea></div>
+        <button class="btn-save" onclick="salvarAcao()">Salvar Ação</button>
+        <button class="btn-log" onclick="abrirModalSenha()">Consultar Histórico</button>
     </div>
 
     <div id="logs-screen" class="container hidden" style="max-width: 900px;">
         <h2>Histórico de Registros</h2>
         <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
             <button onclick="voltarDash()" style="background: #343a40; width: auto; padding: 10px 20px;">Voltar</button>
-            <button style="background: var(--sed-error); width: auto; padding: 10px 20px;" onclick="abrirConfirmacaoLimpeza()">Limpar Histórico</button>
+            <button style="background: var(--sed-error); width: auto; padding: 10px 20px;" onclick="abrirConfirmacaoLimpeza()">Limpar Tudo</button>
         </div>
         <div class="table-container">
             <table>
                 <thead>
                     <tr>
-                        <th>Data/Hora</th>
-                        <th>Cargo/Autor</th>
-                        <th>Ação</th>
-                        <th>Download</th>
+                        <th>Data/Registro</th>
+                        <th>Autor</th>
+                        <th>Título</th>
+                        <th>Documento</th>
                     </tr>
                 </thead>
                 <tbody id="log-table-body"></tbody>
@@ -177,7 +180,7 @@
         let loggedUser = "";
         const DB_NAME = 'gremio_db_v6';
 
-        // --- SISTEMA DE MODAIS ---
+        // --- FUNÇÕES DOS MODAIS ---
         function showAlert(msg) {
             document.getElementById('alert-text').innerText = msg;
             document.getElementById('modal-alert').style.display = 'flex';
@@ -199,7 +202,7 @@
                 renderLogs();
             } else {
                 closePrompt();
-                showAlert("Senha de acesso ao histórico inválida!");
+                showAlert("Senha incorreta!");
             }
         }
 
@@ -209,49 +212,46 @@
             if (confirmado) {
                 localStorage.removeItem(DB_NAME);
                 renderLogs();
-                showAlert("Histórico apagado com sucesso.");
+                showAlert("O histórico foi limpo permanentemente.");
             }
         }
 
-        // --- LÓGICA PRINCIPAL ---
+        // --- LÓGICA DO SISTEMA ---
         function handleLogin() {
             const u = document.getElementById('user').value;
             const p = document.getElementById('pass').value;
-            if (!u) return showAlert("Selecione seu cargo.");
+            if (!u) return showAlert("Por favor, selecione um cargo.");
             if (users[u] === p) {
                 loggedUser = u;
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('dashboard').classList.remove('hidden');
-                document.getElementById('user-display').innerText = "Logado como: " + u;
-            } else { showAlert("Senha de login incorreta!"); }
+                document.getElementById('user-display').innerText = "Cargo: " + u;
+            } else { showAlert("Senha de login inválida!"); }
         }
 
         function salvarAcao() {
-            const f = {
-                ex: document.getElementById('nome_executor').value,
-                tit: document.getElementById('titulo').value,
-                dt: document.getElementById('data').value,
-                desc: document.getElementById('descricao').value
-            };
+            const executor = document.getElementById('nome_executor').value;
+            const titulo = document.getElementById('titulo').value;
+            const dataAcao = document.getElementById('data').value;
 
-            if (!f.ex || !f.tit || !f.dt) return showAlert("Preencha Nome, Título e Data!");
+            if (!executor || !titulo || !dataAcao) return showAlert("Campos Nome, Título e Data são obrigatórios!");
 
             const registro = {
-                id: Date.now(), cargo: loggedUser, autor: f.ex,
+                id: Date.now(), cargo: loggedUser, autor: executor,
                 dataReg: new Date().toLocaleDateString('pt-BR'),
                 horaReg: new Date().toLocaleTimeString('pt-BR'),
-                titulo: f.tit, dataAcao: f.dt, 
+                titulo: titulo, dataAcao: dataAcao, 
                 qtd: document.getElementById('qtd').value,
                 proposta: document.getElementById('proposta').value,
                 tema: document.getElementById('tema').value,
-                descricao: f.desc
+                descricao: document.getElementById('descricao').value
             };
 
             let logs = JSON.parse(localStorage.getItem(DB_NAME) || "[]");
             logs.push(registro);
             localStorage.setItem(DB_NAME, JSON.stringify(logs));
 
-            showAlert("Ação registrada com sucesso!");
+            showAlert("Ação salva com sucesso!");
             document.querySelectorAll('#dashboard input, #dashboard textarea').forEach(i => i.value = "");
         }
 
@@ -262,10 +262,10 @@
             logs.reverse().forEach(log => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td>${log.dataReg} ${log.horaReg}</td>
-                    <td><strong>${log.cargo}</strong><br><small>${log.autor}</small></td>
+                    <td>${log.dataReg} às ${log.horaReg}</td>
+                    <td><strong>${log.autor}</strong></td>
                     <td>${log.titulo}</td>
-                    <td><button class="badge-download" onclick="gerarPDF(${log.id})">PDF</button></td>
+                    <td><button class="badge-download" onclick="gerarPDF(${log.id})">Baixar PDF</button></td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -277,16 +277,17 @@
             const doc = new jsPDF();
             doc.setFillColor(0, 168, 150); doc.rect(0, 0, 210, 40, 'F');
             doc.setTextColor(255, 255, 255); doc.setFontSize(18);
-            doc.text("RELATÓRIO DE AÇÃO ESTUDANTIL", 105, 25, { align: "center" });
+            doc.text("RELATÓRIO DE AÇÃO - GRÊMIO", 105, 25, { align: "center" });
             doc.setTextColor(0, 0, 0); doc.setFontSize(12); doc.setFont("helvetica", "bold");
             doc.text(`Responsável: ${d.autor} (${d.cargo})`, 20, 65);
             doc.setFont("helvetica", "normal");
-            doc.text(`Título: ${d.titulo} | Data: ${d.dataAcao}`, 20, 80);
-            doc.text(`Tema: ${d.tema} | Origem: ${d.proposta}`, 20, 95);
+            doc.text(`Título: ${d.titulo} | Realizado em: ${d.dataAcao}`, 20, 80);
+            doc.text(`Tema: ${d.tema} | Proposta: ${d.proposta}`, 20, 95);
             doc.line(20, 100, 190, 100);
-            doc.text("Descrição:", 20, 110);
-            doc.text(doc.splitTextToSize(d.descricao, 170), 20, 120);
-            doc.save(`Acao_${d.titulo}.pdf`);
+            doc.text("Descrição da Ação:", 20, 110);
+            const descLines = doc.splitTextToSize(d.descricao || "Sem descrição", 170);
+            doc.text(descLines, 20, 120);
+            doc.save(`Relatorio_${d.titulo}.pdf`);
         }
 
         function voltarDash() {
