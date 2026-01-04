@@ -12,9 +12,9 @@
             --sed-dark: #1d2d35;
             --sed-bg: #f0f4f7;
         }
-       
+        
         body { font-family: 'Segoe UI', Arial, sans-serif; background-color: var(--sed-bg); margin: 0; padding: 20px; }
-       
+        
         .container {
             background: #ffffff; padding: 30px; border-radius: 8px;
             box-shadow: 0 5px 20px rgba(0,0,0,0.1); width: 95%;
@@ -26,7 +26,7 @@
             margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid #eee;
         }
         .header-logos img { max-height: 120px; max-width: 200px; object-fit: contain; }
-       
+        
         h2 { text-align: center; color: var(--sed-dark); font-weight: 600; margin-top: 0; }
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-weight: bold; color: #444; }
@@ -41,9 +41,44 @@
         th { background: #f8f9fa; padding: 12px; text-align: left; border-bottom: 2px solid #dee2e6; }
         td { padding: 12px; border-bottom: 1px solid #eee; font-size: 14px; }
         .badge-download { background-color: var(--sed-primary); color: white; padding: 6px 12px; border-radius: 4px; cursor: pointer; border: none; }
+
+        /* Estilos do Novo Modal de Alerta */
+        #custom-alert {
+            display: none; 
+            position: fixed; 
+            top: 0; left: 0; 
+            width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.6); 
+            z-index: 9999; 
+            justify-content: center; 
+            align-items: center;
+            backdrop-filter: blur(2px);
+        }
+        .alert-content {
+            background: white; 
+            padding: 30px; 
+            border-radius: 12px; 
+            max-width: 380px; 
+            width: 85%; 
+            text-align: center; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3); 
+            border-top: 8px solid var(--sed-primary);
+            animation: fadeIn 0.3s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
+
+    <div id="custom-alert">
+        <div class="alert-content">
+            <p id="alert-message" style="font-size: 18px; color: var(--sed-dark); margin-bottom: 25px; line-height: 1.4;"></p>
+            <button onclick="closeAlert()" style="background: var(--sed-primary); width: auto; min-width: 120px; padding: 10px 20px;">Entendido</button>
+        </div>
+    </div>
 
     <div id="login-screen" class="container">
         <div class="header-logos">
@@ -74,11 +109,11 @@
             <a href="#" onclick="location.reload()" style="color: #dc3545; font-size: 12px;">Sair</a>
         </div>
         <h2>Cadastrar Ação - Grêmio Estudantil</h2>
-       
+        
         <div class="form-group"><label>Nome de quem está realizando a ação</label><input type="text" id="nome_executor" placeholder="Digite seu nome completo"></div>
 
         <div class="form-group"><label>Título da Ação</label><input type="text" id="titulo"></div>
-       
+        
         <div style="display: flex; gap: 10px;">
             <div class="form-group" style="flex: 1;"><label>Data</label><input type="date" id="data"></div>
             <div class="form-group" style="flex: 1;"><label>Participantes</label><input type="number" id="qtd"></div>
@@ -123,7 +158,7 @@
 
     <script>
         const { jsPDF } = window.jspdf;
-       
+        
         const users = {
             "COORDENADOR FINANCEIRO": "16",
             "COORDENADOR EVENTOS": "16",
@@ -131,23 +166,36 @@
             "COORDENADOR DESPORTIVO": "16",
             "COORDENADOR CULTURAL": "16",
             "COORDENADOR RELAÇÕES SOCIAIS/CONVIVA": "16",
-            "COMISSÃO DE' DIREITOS HUMANOS": "16",
+            "COMISSÃO DE DIREITOS HUMANOS": "16",
             "CHEFE DE COMISSÕES": "16"
         };
-       
+        
         let loggedUser = "";
         const DB_NAME = 'gremio_db_v6';
 
+        // --- FUNÇÕES DO ALERTA CUSTOMIZADO ---
+        function showAlert(msg) {
+            document.getElementById('alert-message').innerText = msg;
+            document.getElementById('custom-alert').style.display = 'flex';
+        }
+
+        function closeAlert() {
+            document.getElementById('custom-alert').style.display = 'none';
+        }
+
+        // --- LÓGICA DO SISTEMA ---
         function handleLogin() {
             const u = document.getElementById('user').value;
             const p = document.getElementById('pass').value;
-            if (u === "") return alert("Selecione um cargo.");
+            if (u === "") return showAlert("Por favor, selecione um cargo antes de continuar.");
             if (users[u] === p) {
                 loggedUser = u;
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('dashboard').classList.remove('hidden');
                 document.getElementById('user-display').innerText = "Cargo: " + u;
-            } else { alert("Senha inválida!"); }
+            } else { 
+                showAlert("Senha incorreta! Tente novamente."); 
+            }
         }
 
         function salvarAcao() {
@@ -159,7 +207,7 @@
             const tema = document.getElementById('tema').value;
             const descricao = document.getElementById('descricao').value;
 
-            if (!executor || !titulo || !dataAcao) return alert("Preencha o Nome, Título e Data!");
+            if (!executor || !titulo || !dataAcao) return showAlert("Atenção: Nome, Título e Data são obrigatórios!");
 
             const registro = {
                 id: Date.now(),
@@ -174,7 +222,7 @@
             logs.push(registro);
             localStorage.setItem(DB_NAME, JSON.stringify(logs));
 
-            alert("Ação salva com sucesso!");
+            showAlert("Excelente! A ação foi registrada com sucesso.");
             document.querySelectorAll('input, textarea').forEach(i => i.value = "");
         }
 
@@ -184,7 +232,9 @@
                 document.getElementById('dashboard').classList.add('hidden');
                 document.getElementById('logs-screen').classList.remove('hidden');
                 renderLogs();
-            } else { alert("Acesso Negado!"); }
+            } else if(pass !== null) { 
+                showAlert("Acesso Negado: Senha do histórico incorreta."); 
+            }
         }
 
         function renderLogs() {
@@ -214,20 +264,20 @@
             doc.setTextColor(255, 255, 255);
             doc.setFontSize(18);
             doc.text("RELATÓRIO DE AÇÃO ESTUDANTIL", 105, 25, { align: "center" });
-           
+            
             doc.setTextColor(0, 0, 0);
             doc.setFontSize(12);
             doc.setFont("helvetica", "bold");
             doc.text(`Grêmio Estudantil: Geração Consciente`, 20, 55);
             doc.text(`Responsável: ${d.autor} (${d.cargo})`, 20, 65);
-           
+            
             doc.setFont("helvetica", "normal");
             doc.text(`Título da Ação: ${d.titulo}`, 20, 80);
             doc.text(`Data da Realização: ${d.dataAcao}`, 20, 90);
             doc.text(`Participantes: ${d.qtd}`, 20, 100);
             doc.text(`Origem: ${d.proposta}`, 20, 110);
             doc.text(`Tema: ${d.tema}`, 20, 120);
-           
+            
             doc.line(20, 125, 190, 125);
             doc.text("Descrição:", 20, 135);
             const descLines = doc.splitTextToSize(d.descricao, 170);
@@ -242,6 +292,7 @@
             if (confirm("Apagar todos os registros permanentemente?")) {
                 localStorage.removeItem(DB_NAME);
                 renderLogs();
+                showAlert("O histórico foi limpo.");
             }
         }
 
