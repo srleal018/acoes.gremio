@@ -129,22 +129,22 @@
             <a href="#" onclick="location.reload()" style="color: var(--sed-error); font-size: 12px; text-decoration: none;">Sair</a>
         </div>
         <h2>Registrar Ação - Grêmio Estudantil</h2>
-        <div class="form-group"><label>Nome do Responsável por Cadastrar a Ação</label><input type="text" id="nome_executor" placeholder="Seu nome"></div>
-        <div class="form-group"><label>Título da Ação</label><input type="text" id="titulo"></div>
+        <div class="form-group"><label>Nome do Responsável por Cadastrar a Ação:</label><input type="text" id="nome_executor" placeholder="Seu nome"></div>
+        <div class="form-group"><label>Título da Ação:</label><input type="text" id="titulo"></div>
         <div style="display: flex; gap: 10px;">
-            <div class="form-group" style="flex: 1;"><label>Data</label><input type="date" id="data"></div>
-            <div class="form-group" style="flex: 1;"><label>Alunos que participaram</label><input type="number" id="qtd"></div>
+            <div class="form-group" style="flex: 1;"><label>Data:</label><input type="date" id="data"></div>
+            <div class="form-group" style="flex: 1;"><label>Quantidade de Alunos Participantes:</label><input type="number" id="qtd"></div>
         </div>
         <div class="form-group">
-            <label>Proposta de Ação</label>
+            <label>Proposta de Ação:</label>
             <select id="proposta">
                 <option value="Grêmio">Grêmio</option>
                 <option value="Gestão Escolar">Gestão Escolar</option>
                 <option value="GRESP - SEDUC">GRESP - SEDUC</option>
             </select>
         </div>
-        <div class="form-group"><label>Tema</label><input type="text" id="tema"></div>
-        <div class="form-group"><label>Descrição Detalhada</label><textarea id="descricao" rows="4"></textarea></div>
+        <div class="form-group"><label>Tema:</label><input type="text" id="tema"></div>
+        <div class="form-group"><label>Descrição da Ação:</label><textarea id="descricao" rows="4"></textarea></div>
         <button class="btn-save" onclick="salvarAcao()">Salvar Ação</button>
         <button class="btn-log" onclick="abrirModalSenha()">Consultar Histórico</button>
     </div>
